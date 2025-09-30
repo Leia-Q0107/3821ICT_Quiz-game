@@ -1,4 +1,5 @@
 // app/admin/page.tsx
+
 import { Suspense } from 'react';
 import AdminCharts from '@/components/AdminCharts';
 

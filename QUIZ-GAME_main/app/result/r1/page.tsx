@@ -108,7 +108,7 @@ export default function PageR1() {
         {/* Main Character */}
         <div className="absolute left-[79px] top-[79px] w-[217px] h-[217px]">
           <Image
-            src="/r1/City_Visionary.png"
+            src="/R1/City_Visionary.png"
             alt="City Visionary"
             width={217}      
             height={217} 
@@ -174,7 +174,7 @@ export default function PageR1() {
           onClick={() => setOpen('luckyCharm')}
           className="absolute left-[38px] top-[574px] w-[299px] h-[91px] bg-white rounded-[14px]"
         >
-          <Image src="/r1/IMG_1149.png" alt="Lucky Charm" width={76} height={76} className="absolute left-[9px] top-[8px] w-[76px] h-[76px]" />
+          <Image src="/R1/IMG_1149.png" alt="Lucky Charm" width={76} height={76} className="absolute left-[9px] top-[8px] w-[76px] h-[76px]" />
           <div className={`${bagel400.className} absolute left-[141px] top-[5px] flex items-center whitespace-nowrap`}>
             <span className="text-[16px]" style={{ color: '#4D688C' }}>Lucky&nbsp;</span>
             <span className="text-[16px]" style={{ color: '#F2A25C' }}>Charm</span>
@@ -196,7 +196,7 @@ export default function PageR1() {
           <div className={`${bagel400.className} absolute left-[40px] top-[2px] text-[16px] leading-[32px]`} style={{ color: '#4D688C' }}>
             Partner
           </div>
-          <Image src="/r1/IMG_1134.png" alt="Partner" width={80} height={80} className="absolute left-[30px] top-[25px] w-[80px] h-[80px]" />
+          <Image src="/R1/IMG_1134.png" alt="Partner" width={80} height={80} className="absolute left-[30px] top-[25px] w-[80px] h-[80px]" />
           <div className={`${dongle700.className} absolute text-center text-[14px] font-bold`} style={{ left: 7, top: 95, width: 129, color: '#4D688C' }}>
             Creative Learner
           </div>
