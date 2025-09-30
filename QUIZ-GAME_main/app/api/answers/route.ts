@@ -13,18 +13,16 @@ const AnswerSchema = z.object({
 
 type SubmissionRow = {
   id: string;
-  answers: unknown;
+  answers: unknown;         
   persona: string;
-  meta: unknown;
-  created_at: string;
+  meta: unknown;              
+  created_at: string;        
 };
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
     const parsed = AnswerSchema.parse(body);
-
-    // Generate UUID in app (no DB extension needed)
     const id = crypto.randomUUID();
 
     await query`
@@ -62,7 +60,17 @@ export async function GET(req: Request) {
       ORDER BY created_at DESC
       LIMIT ${capped}
     `;
-    return NextResponse.json({ items: rows });
+
+    //  统一 createdAt，契合 /admin 的类型 Item
+    const items = rows.map((r) => ({
+      id: r.id,
+      answers: r.answers as Record<string, string>,
+      persona: r.persona,
+      meta: (r.meta ?? {}) as Record<string, unknown>,
+      createdAt: r.created_at,              // 关键映射
+    }));
+
+    return NextResponse.json({ items });
   } catch (err) {
     console.error('GET /api/answers error', err);
     return NextResponse.json({ items: [] }, { status: 500 });
