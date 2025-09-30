@@ -16,7 +16,7 @@ type SubmissionRow = {
   answers: unknown;
   persona: string;
   meta: unknown;
-  created_at: string;
+  createdAt: string;      //  直接在 SQL 里把 created_at 别名成驼峰
 };
 
 export async function POST(req: Request) {
@@ -47,11 +47,11 @@ export async function GET(req: Request) {
   const limitParam = Number(url.searchParams.get('limit') ?? '100');
   const capped = Math.max(1, Math.min(Number.isFinite(limitParam) ? limitParam : 100, 1000));
 
-  // --- 允许“同源内部请求”（服务端从当前域名发起）免密通过 ---
+  // 允许“同源内部请求”免密通过（SSR/站点自身访问）
   const reqHost = req.headers.get('x-forwarded-host') ?? req.headers.get('host');
-  const isSameOrigin = !!reqHost && `${reqHost}`.toLowerCase() === url.host.toLowerCase();
+  const isSameOrigin = !!reqHost && reqHost.toLowerCase() === url.host.toLowerCase();
 
-  // --- Bearer 校验（对外部请求仍然要求密钥） ---
+  // 对外部请求仍要求 Bearer
   const auth = req.headers.get('authorization') ?? '';
   const token = auth.replace(/^Bearer\s+/i, '');
   const tokenOk = !!token && token === (process.env.ANALYTICS_API_KEY ?? '');
@@ -61,25 +61,26 @@ export async function GET(req: Request) {
   }
 
   try {
+    //  1) 直接在 SQL 层完成字段对齐与类型稳定
     const { rows } = await query<SubmissionRow>`
-      SELECT id, answers, persona, meta, created_at
+      SELECT
+        id,
+        (answers)::jsonb        AS answers,
+        persona,
+        (meta)::jsonb           AS meta,
+        created_at              AS "createdAt"   --  别名成页面预期
       FROM quiz_submissions
-      ORDER BY created_at DESC
+      ORDER BY created_at DESC NULLS LAST
       LIMIT ${capped}
     `;
 
-    // 映射成页面需要的驼峰字段
-    const items = rows.map((r) => ({
-      id: r.id,
-      answers: r.answers as Record<string, string>,
-      persona: r.persona,
-      meta: (r.meta ?? {}) as Record<string, unknown>,
-      createdAt: r.created_at,
-    }));
+    // 2) 轻量自检日志（部署后可删除）
+    console.log('GET /api/answers rows:', rows.length);
 
-    return NextResponse.json({ items });
+    // 3) 直接返回页面所需结构（Item[]）
+    return NextResponse.json({ items: rows });
   } catch (err) {
-    console.error('GET /api/answers error', err);
+    console.error('GET /api/answers SQL error:', err);
     return NextResponse.json({ items: [] }, { status: 500 });
   }
 }
