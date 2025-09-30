@@ -1,9 +1,10 @@
 // app/admin/page.tsx
-
 import { Suspense } from 'react';
 import AdminCharts from '@/components/AdminCharts';
+import { getBaseUrl } from '@/lib/base-url';
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs'; // pg/Node APIs -> Node runtime
 
 type PersonaName =
   | 'City Visionary'
@@ -29,12 +30,16 @@ type Item = {
 type ItemsResponse = { items?: Item[] };
 
 async function getData(): Promise<Item[]> {
-  const base = process.env.NEXT_PUBLIC_BASE_URL ?? '';
-  const url = `${base}/api/answers?limit=500`;
+  // build absolute URL for server-side fetch
+  const url = `${getBaseUrl()}/api/answers?limit=500`;
+
   const r = await fetch(url, {
-    headers: { Authorization: `Bearer ${process.env.ANALYTICS_API_KEY ?? ''}` },
+    headers: {
+      Authorization: `Bearer ${process.env.ANALYTICS_API_KEY ?? ''}`,
+    },
     cache: 'no-store',
   });
+
   if (!r.ok) return [];
   const json = (await r.json()) as ItemsResponse;
   return json.items ?? [];
@@ -82,20 +87,16 @@ export default async function AdminPage() {
 
   return (
     <main className="min-h-screen p-8 bg-slate-50">
-      {/* Title row */}
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight text-slate-900">Quiz Dashboard</h1>
-        {/* optional spot for actions / filters later */}
       </div>
 
       <Suspense fallback={<p className="text-slate-600">Loading charts…</p>}>
         <AdminCharts personas={personaCounts} />
       </Suspense>
 
-      {/* Table card */}
       <section className="mt-10">
         <h2 className="text-xl font-semibold mb-3 text-slate-800">Recent submissions</h2>
-
         <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
           <div className="overflow-x-auto">
             <table className="min-w-[720px] w-full text-sm">
@@ -110,9 +111,7 @@ export default async function AdminPage() {
                 {items.slice(0, 25).map((it, i) => (
                   <tr
                     key={it.id}
-                    className={`border-t border-slate-200 ${
-                      i % 2 === 0 ? 'bg-white' : 'bg-slate-50/60'
-                    }`}
+                    className={`border-t border-slate-200 ${i % 2 === 0 ? 'bg-white' : 'bg-slate-50/60'}`}
                   >
                     <td className="px-3 py-2 whitespace-nowrap">{formatCreatedAt(it.createdAt)}</td>
                     <td className="px-3 py-2 whitespace-nowrap">{it.persona}</td>
@@ -123,7 +122,6 @@ export default async function AdminPage() {
                     </td>
                   </tr>
                 ))}
-
                 {items.length === 0 && (
                   <tr>
                     <td className="px-3 py-10 text-slate-500 text-center" colSpan={3}>
