@@ -1,12 +1,15 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-export default function AdminLogin() {
+// The component that *uses* useSearchParams must be inside Suspense
+function LoginForm() {
   const sp = useSearchParams();
   const next = sp.get('next') || '/admin';
   const router = useRouter();
+
   const [username, setU] = useState('');
   const [password, setP] = useState('');
   const [err, setErr] = useState<string | null>(null);
@@ -46,14 +49,23 @@ export default function AdminLogin() {
 
         <label style={{ display: 'grid', gap: 6 }}>
           <span>Username</span>
-          <input value={username} onChange={e => setU(e.target.value)} required
-            style={{ padding: 10, borderRadius: 8, border: '1px solid #000000ff' }} />
+          <input
+            value={username}
+            onChange={e => setU(e.target.value)}
+            required
+            style={{ padding: 10, borderRadius: 8, border: '1px solid #000000ff' }}
+          />
         </label>
 
         <label style={{ display: 'grid', gap: 6 }}>
           <span>Password</span>
-          <input type="password" value={password} onChange={e => setP(e.target.value)} required
-            style={{ padding: 10, borderRadius: 8, border: '1px solid #000000ff' }} />
+          <input
+            type="password"
+            value={password}
+            onChange={e => setP(e.target.value)}
+            required
+            style={{ padding: 10, borderRadius: 8, border: '1px solid #000000ff' }}
+          />
         </label>
 
         {err && <div style={{ color: '#b00', fontSize: 14 }}>{err}</div>}
@@ -66,9 +78,22 @@ export default function AdminLogin() {
             background: '#111827', color: '#fff', fontWeight: 700, cursor: 'pointer'
           }}
         >
-          {busy ? 'Loging in…' : 'Login'}
+          {busy ? 'Logging in…' : 'Login'}
         </button>
       </form>
     </main>
+  );
+}
+
+// The page renders a Suspense boundary around the client bit
+export default function AdminLoginPage() {
+  return (
+    <Suspense fallback={
+      <main style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', background: '#f7f7fb' }}>
+        <div style={{ fontSize: 16, color: '#111827' }}>Loading…</div>
+      </main>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }
