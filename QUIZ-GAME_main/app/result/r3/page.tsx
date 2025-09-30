@@ -87,7 +87,7 @@ export default function R3Page() {
       aborted = true;
       controller.abort();
     };
-  }, []);
+  }, [motto]);
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-neutral-200">

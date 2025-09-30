@@ -3,17 +3,10 @@ import { NextResponse } from 'next/server';
 import OpenAI, { APIError } from 'openai';
 
 export const runtime = 'nodejs';
-
-const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+export const dynamic = 'force-dynamic';
 
 const FALLBACKS: Record<string, string[]> = {
-  'City Visionary': [
-    'Build boldly shape tomorrow',
-    'Dream bigger lead cities',
-    'Create spark change',
-  ],
+  'City Visionary': ['Build boldly shape tomorrow', 'Dream bigger lead cities', 'Create spark change'],
   'Adventurous Scholar': ['Chase thrills master skills', 'Learn fast live bold'],
   'Dynamic Explorer': ['Move fast explore more', 'Go further every day'],
   'Creative Innovator': ['Invent wonder inspire change', 'Make art meet impact'],
@@ -33,10 +26,25 @@ function toMaxEightWords(s: string) {
   return cleaned.split(' ').filter(Boolean).slice(0, 8).join(' ');
 }
 
-export async function POST(req: Request) {
-  try {
-    const { persona = '' } = await req.json().catch(() => ({}));
+// ✅ lazy client getter (no throws at import time)
+function getClient() {
+  const key = process.env.OPENAI_API_KEY;
+  if (!key) return null;
+  return new OpenAI({ apiKey: key });
+}
 
+export async function POST(req: Request) {
+  const { persona = '' } = await req.json().catch(() => ({}));
+  const client = getClient();
+
+  // If no key in env, return a safe fallback instead of crashing the build/server.
+  if (!client) {
+    const pool = FALLBACKS[persona] ?? FALLBACKS.default;
+    const motto = pool[Math.floor(Math.random() * pool.length)];
+    return NextResponse.json({ motto: toMaxEightWords(motto), fallback: true });
+  }
+
+  try {
     const system = [
       'You are a concise copywriter.',
       'Write ONE short ENGLISH motto for the given student persona.',
@@ -69,7 +77,6 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ motto: toMaxEightWords(mottoRaw) });
   } catch (err) {
-    // ---- narrowed, no `any` ----
     let status: number | undefined;
     let msg = '';
 
@@ -78,7 +85,6 @@ export async function POST(req: Request) {
       msg = err.message ?? '';
     } else if (err instanceof Error) {
       msg = err.message;
-      // Some runtimes attach numeric fields like status/statusCode
       const maybe = err as { status?: number; statusCode?: number };
       status = maybe.status ?? maybe.statusCode;
     }

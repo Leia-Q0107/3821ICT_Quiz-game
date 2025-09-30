@@ -3,6 +3,7 @@
 
 
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 
 export default function Home() {
@@ -13,9 +14,11 @@ export default function Home() {
     <main className="min-h-screen flex items-center justify-center bg-neutral-200">
       <div className="relative w-[390px] h-[844px] bg-[#8b97a6] rounded-[28px] shadow-2xl overflow-hidden text-white">
         {/* Fullscreen title poster */}
-        <img
+        <Image
           src="/posters/title.png"
           alt="Title"
+          width={390}
+          height={844}
           className="absolute inset-0 w-full h-full object-cover pointer-events-none select-none"
           draggable={false}
         />
