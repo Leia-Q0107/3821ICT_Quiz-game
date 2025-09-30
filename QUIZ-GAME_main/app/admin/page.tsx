@@ -1,10 +1,10 @@
 // app/admin/page.tsx
 import { Suspense } from 'react';
-import { headers } from 'next/headers';
 import AdminCharts from '@/components/AdminCharts';
+import { query } from '@/lib/db'; // 直接查库
 
 export const dynamic = 'force-dynamic';
-export const runtime = 'nodejs'; // keep Node runtime for server-side work
+export const runtime = 'nodejs';
 
 type PersonaName =
   | 'City Visionary'
@@ -27,46 +27,6 @@ type Item = {
   meta?: Record<string, unknown>;
 };
 
-type ItemsResponse = { items?: Item[] };
-
-async function getData(): Promise<Item[]> {
-  // Build absolute base from the incoming request headers (works on Vercel prod/preview/custom domain)
-  const h = await headers();
-  const host = h.get('x-forwarded-host') ?? h.get('host');
-  const proto = h.get('x-forwarded-proto') ?? 'https';
-  const base = `${proto}://${host}`;
-
-  const r = await fetch(`${base}/api/answers?limit=500`, {
-    headers: {
-      Authorization: `Bearer ${process.env.ANALYTICS_API_KEY ?? ''}`,
-    },
-    cache: 'no-store',
-  });
-
-  if (!r.ok) return [];
-  const json = (await r.json()) as ItemsResponse;
-  return json.items ?? [];
-}
-
-function formatCreatedAt(input: CreatedAt): string {
-  if (input == null) return '—';
-  try {
-    if (typeof input === 'string') {
-      const d = new Date(input);
-      return isNaN(d.getTime()) ? '—' : d.toLocaleString();
-    }
-    if (typeof input === 'number') {
-      const d = new Date(input);
-      return isNaN(d.getTime()) ? '—' : d.toLocaleString();
-    }
-    if (typeof input === 'object' && 'seconds' in input && typeof input.seconds === 'number') {
-      const d = new Date(input.seconds * 1000);
-      return isNaN(d.getTime()) ? '—' : d.toLocaleString();
-    }
-  } catch {}
-  return '—';
-}
-
 function emptyPersonaCounts(): Record<PersonaName, number> {
   return {
     'City Visionary': 0,
@@ -80,8 +40,54 @@ function emptyPersonaCounts(): Record<PersonaName, number> {
   };
 }
 
+async function getDataDirect(): Promise<Item[]> {
+  // 直接从数据库读取，并把 created_at 映射为 createdAt（驼峰）
+  const { rows } = await query<{
+    id: string;
+    answers: unknown;
+    persona: string;
+    meta: unknown;
+    createdAt: string;
+  }>`
+    SELECT
+      id,
+      (answers)::jsonb  AS answers,
+      persona,
+      (meta)::jsonb     AS meta,
+      created_at        AS "createdAt"
+    FROM quiz_submissions
+    ORDER BY created_at DESC NULLS LAST
+    LIMIT 500
+  `;
+
+  // rows 已经是页面需要的字段名格式
+  return rows.map((r) => ({
+    id: r.id,
+    answers: (r.answers ?? {}) as Record<string, string>,
+    persona: r.persona,
+    meta: (r.meta ?? {}) as Record<string, unknown>,
+    createdAt: r.createdAt,
+  }));
+}
+
+function formatCreatedAt(input: CreatedAt): string {
+  if (input == null) return '—';
+  try {
+    if (typeof input === 'string' || typeof input === 'number') {
+      const d = new Date(input);
+      return isNaN(d.getTime()) ? '—' : d.toLocaleString();
+    }
+    if (typeof input === 'object' && 'seconds' in input && typeof input.seconds === 'number') {
+      const d = new Date(input.seconds * 1000);
+      return isNaN(d.getTime()) ? '—' : d.toLocaleString();
+    }
+  } catch {}
+  return '—';
+}
+
 export default async function AdminPage() {
-  const items = await getData();
+  //  改为直接查库
+  const items = await getDataDirect();
 
   const personaCounts = items.reduce<Record<PersonaName, number>>((acc, it) => {
     if (it.persona in acc) acc[it.persona as PersonaName] += 1;
