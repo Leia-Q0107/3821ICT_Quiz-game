@@ -1,10 +1,10 @@
 // app/admin/page.tsx
 import { Suspense } from 'react';
+import { headers } from 'next/headers';
 import AdminCharts from '@/components/AdminCharts';
-import { getBaseUrl } from '@/lib/base-url';
 
 export const dynamic = 'force-dynamic';
-export const runtime = 'nodejs'; // pg/Node APIs -> Node runtime
+export const runtime = 'nodejs'; // keep Node runtime for server-side work
 
 type PersonaName =
   | 'City Visionary'
@@ -30,10 +30,13 @@ type Item = {
 type ItemsResponse = { items?: Item[] };
 
 async function getData(): Promise<Item[]> {
-  // build absolute URL for server-side fetch
-  const url = `${getBaseUrl()}/api/answers?limit=500`;
+  // Build absolute base from the incoming request headers (works on Vercel prod/preview/custom domain)
+  const h = await headers();
+  const host = h.get('x-forwarded-host') ?? h.get('host');
+  const proto = h.get('x-forwarded-proto') ?? 'https';
+  const base = `${proto}://${host}`;
 
-  const r = await fetch(url, {
+  const r = await fetch(`${base}/api/answers?limit=500`, {
     headers: {
       Authorization: `Bearer ${process.env.ANALYTICS_API_KEY ?? ''}`,
     },
@@ -122,6 +125,7 @@ export default async function AdminPage() {
                     </td>
                   </tr>
                 ))}
+
                 {items.length === 0 && (
                   <tr>
                     <td className="px-3 py-10 text-slate-500 text-center" colSpan={3}>
