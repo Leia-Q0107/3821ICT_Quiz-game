@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 /** Adjustable frame parameters **/
 const BORDER_COLOR = '#F2A25C';
@@ -213,10 +214,13 @@ export default function ChoosePage() {
                 >
                   {/* Image + configurable frame container */}
                   <div className="relative w-full h-full">
-                    <img
+                    <Image
                       src={card.src}
                       alt={card.label}
-                      className="w-full h-full object-contain pointer-events-none select-none"
+                      fill                     // ✅ provide intrinsic sizing via fill
+                      sizes="220px"            // ✅ tells Next the rendered width at this breakpoint
+                      priority={idx < 3}       // optional: eager-load a few visible cards
+                      style={{ objectFit: 'contain' }}
                       draggable={false}
                     />
                     {isSelected && (

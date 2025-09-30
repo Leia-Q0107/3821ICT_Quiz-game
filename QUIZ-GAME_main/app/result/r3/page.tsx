@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Dongle, Bagel_Fat_One } from 'next/font/google';
+import Image from 'next/image';
 
 const dongle700 = Dongle({ subsets: ['latin'], weight: '700' });
 const bagel400 = Bagel_Fat_One({ subsets: ['latin'], weight: '400' });
@@ -74,7 +75,6 @@ export default function R3Page() {
         }
       } catch (err: unknown) {
         if (isAbortError(err)) return;
-        // eslint-disable-next-line no-console
         console.error('[r3] motto api failed:', err);
         if (!aborted && !motto) setMotto('Explore learn and thrive');
       } finally {
@@ -115,9 +115,11 @@ export default function R3Page() {
         </span>
 
         {/* Main Illustration */}
-        <img
+        <Image
           src="/r3/Focused_Scholar.png"
           alt="Focused Scholar"
+          width={217}      
+          height={217} 
           className="absolute select-none pointer-events-none"
           style={{ left: 79, top: 79, width: 217, height: 217 }}
           draggable={false}
@@ -323,7 +325,7 @@ export default function R3Page() {
             borderRadius: 14,
           }}
         />
-        <img src="/r3/IMG_1152.png" alt="Headphones" className="absolute" style={{ left: 47, top: 582, width: 76, height: 76 }} />
+        <Image src="/r3/IMG_1152.png" alt="Headphones" width={76} height={76} className="absolute" style={{ left: 47, top: 582, width: 76, height: 76 }} />
         <span className={bagel400.className} style={{ position: 'absolute', top: 579, left: 179, width: 98, height: 19, fontSize: 16, lineHeight: '19px', textAlign: 'center' }}>
           <span style={{ color: '#BF4F26' }}>Lucky </span>
           <span style={{ color: '#4D688C' }}>Charm</span>
@@ -367,7 +369,7 @@ export default function R3Page() {
         <span className={bagel400.className} style={{ position: 'absolute', left: 38, top: 680, width: 139, textAlign: 'center', fontSize: 16, lineHeight: '32px', color: '#4D688C' }}>
           Partner
         </span>
-        <img src="/r3/IMG_1136.png" alt="Mindful Learner" className="absolute" style={{ left: 71, top: 704, width: 72, height: 72 }} />
+        <Image src="/r3/IMG_1136.png" alt="Mindful Learner" width={80} height={80} className="absolute" style={{ left: 71, top: 704, width: 72, height: 72 }} />
         <span className={dongle700.className} style={{ position: 'absolute', left: 38, top: 777, width: 139, textAlign: 'center', fontSize: 16, lineHeight: '14px', color: '#4D688C' }}>
           Mindful Learner
         </span>

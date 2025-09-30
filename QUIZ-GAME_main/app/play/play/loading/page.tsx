@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { computePersona, type Persona } from '@/lib/scoring';
 import { getAnswers } from '@/lib/answers';
+import Image from 'next/image';
 
 // persona → result route folder
 const PERSONA_TO_RESULT: Record<Persona, string> = {
@@ -105,7 +106,6 @@ export default function Page() {
             try { localStorage.setItem('submissionId', json.id); } catch {}
           }
         } else {
-          // eslint-disable-next-line no-console
           console.warn('POST /api/answers non-2xx:', r.status);
         }
       } catch (err) {
@@ -132,11 +132,25 @@ export default function Page() {
         background: '#fff',
       }}
     >
-      <div style={{ position: 'relative', display: 'inline-block' }}>
-        <img
+      {/* ✅ sized container with fixed aspect ratio */}
+      <div
+        style={{
+          position: 'relative',
+          width: 'min(92vw, 390px)',
+          aspectRatio: '390 / 844',
+          maxHeight: '100vh',
+          borderRadius: 8,
+          overflow: 'hidden',
+        }}
+      >
+        {/* ✅ Image fills the container; no width/height error */}
+        <Image
           src="/Q8/Background.png"
           alt="Gathering results"
-          style={{ maxHeight: '100vh', width: 'auto', display: 'block', borderRadius: 8 }}
+          fill
+          sizes="(max-width: 390px) 100vw, 390px"
+          priority
+          className="object-contain"
         />
 
         {mounted && (

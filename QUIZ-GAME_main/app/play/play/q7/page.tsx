@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { JSX } from 'react/jsx-runtime';
 import { saveAnswer, getAnswers } from '@/lib/answers';
+import Image from 'next/image';
 
 type Opt = { id: number; title: JSX.Element; img: string; key: 'arena' | 'power' | 'build' | 'tour' };
 
@@ -78,11 +79,14 @@ export default function Q7Page() {
                   active ? 'ring-[4px] ring-[#4EA7FF]' : 'ring-0',
                 ].join(' ')}
               >
-                <div className="overflow-hidden rounded-[20px]">
-                  <img
+                {/* changed: add relative + fixed height, use Image `fill` */}
+                <div className="relative overflow-hidden rounded-[20px] h-[180px]">
+                  <Image
                     src={opt.img}
                     alt=""
-                    className="w-full h-[180px] object-cover"
+                    fill
+                    sizes="152px"                // rendered width hint
+                    className="object-cover"
                     draggable={false}
                   />
                 </div>
@@ -101,6 +105,7 @@ export default function Q7Page() {
             );
           })}
         </section>
+
 
         <footer className="absolute inset-x-0 bottom-8 flex flex-col items-center gap-3">
           <button

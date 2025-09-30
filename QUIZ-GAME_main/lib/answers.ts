@@ -55,8 +55,10 @@ export function removeAnswer(id: string): boolean {
   if (!isBrowser()) return false;
   const cur = getAnswers();
   if (!(id in cur)) return true;
-  const { [id]: _omit, ...rest } = cur;
+
   try {
+    const rest = { ...cur };
+    delete rest[id]; // remove the key without creating an unused binding
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(rest));
     window.dispatchEvent(new CustomEvent<Answers>('answers:change', { detail: rest }));
     return true;
@@ -64,6 +66,7 @@ export function removeAnswer(id: string): boolean {
     return false;
   }
 }
+
 
 /** Clear all */
 export function clearAnswers(): boolean {

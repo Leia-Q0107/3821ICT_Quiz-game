@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Dongle, Bagel_Fat_One } from 'next/font/google';
+import Image from 'next/image';
 
 const dongle700 = Dongle({ subsets: ['latin'], weight: '700' });
 const bagel400  = Bagel_Fat_One({ subsets: ['latin'], weight: '400' });
@@ -77,7 +78,6 @@ export default function PageR2() {
         }
       } catch (err: unknown) {
         if (isAbortError(err)) return;
-        // eslint-disable-next-line no-console
         console.error('[r2] motto api failed:', err);
         if (!aborted && !motto) setMotto('Explore learn and thrive');
       } finally {
@@ -90,7 +90,7 @@ export default function PageR2() {
       aborted = true;
       controller.abort();
     };
-  }, []);
+  }, [motto]);
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-neutral-200">
@@ -107,9 +107,11 @@ export default function PageR2() {
 
         {/* Main Character */}
         <div className="absolute left-[79px] top-[79px] w-[217px] h-[217px]">
-          <img
+          <Image
             src="/r2/Dynamic_Explorer.png"
             alt="Dynamic Explorer"
+            width={217}      
+            height={217} 
             className="w-full h-full object-contain select-none pointer-events-none"
             draggable={false}
           />
@@ -167,7 +169,7 @@ export default function PageR2() {
           type="button"
           onClick={() => setOpen('luckyCharm')}
           className="absolute left-[38px] top-[574px] w-[299px] h-[91px] bg-white rounded-[14px]">
-          <img src="/r2/camera.png" alt="Lucky Charm" className="absolute left-[9px] top-[8px] w-[76px] h-[76px]" />
+          <Image src="/r2/camera.png" alt="Lucky Charm" width={76} height={76} className="absolute left-[9px] top-[8px] w-[76px] h-[76px]" />
           <div className={`${bagel400.className} absolute left-[141px] top-[5px] flex items-center whitespace-nowrap`}>
             <span className="text-[16px]" style={{ color: '#152840' }}>Lucky&nbsp;</span>
             <span className="text-[16px]" style={{ color: '#4D688C' }}>Charm</span>
@@ -185,7 +187,7 @@ export default function PageR2() {
           <div className={`${bagel400.className} absolute left-[40px] top-[2px] text-[16px] leading-[32px]`} style={{ color: '#152840' }}>
             Partner
           </div>
-          <img src="/r2/owl.png" alt="Partner" className="absolute left-[30px] top-[25px] w-[80px] h-[80px]" />
+          <Image src="/r2/owl.png" alt="Partner" width={80} height={80} className="absolute left-[30px] top-[25px] w-[80px] h-[80px]" />
           <div className={`${dongle700.className} absolute text-center text-[14px] font-bold`} style={{ left: 7, top: 95, width: 129, color: '#152840' }}>
             Adventurous Scholar
           </div>

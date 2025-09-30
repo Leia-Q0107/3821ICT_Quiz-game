@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Dongle, Bagel_Fat_One } from 'next/font/google';
-import { saveAnswer } from '@/lib/answers'; // ✅ 新增
+import { saveAnswer } from '@/lib/answers';
+import Image from 'next/image';
 
 const dongle = Dongle({ subsets: ['latin'], weight: ['300', '700'] });
 const bagel  = Bagel_Fat_One({ subsets: ['latin'], weight: '400' });
@@ -80,7 +81,13 @@ function Sprite({ it, mode }: { it: Item; mode: 'static' | 'exitUp' | 'fade' | '
 
   return (
     <div style={style}>
-      <img src={it.src} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block', opacity: it.opacity ?? 1 }} />
+      <Image 
+      src={it.src} 
+      alt="" 
+      width={Math.round(it.w)}
+      height={Math.round(it.h)}
+      draggable={false}
+      style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block', opacity: it.opacity ?? 1 }} />
     </div>
   );
 }

@@ -1,11 +1,11 @@
 // app/api/motto/route.ts
 import { NextResponse } from 'next/server';
-import OpenAI from 'openai';
+import OpenAI, { APIError } from 'openai';
 
 export const runtime = 'nodejs';
 
 const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY, // keep in env
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 const FALLBACKS: Record<string, string[]> = {
@@ -14,34 +14,13 @@ const FALLBACKS: Record<string, string[]> = {
     'Dream bigger lead cities',
     'Create spark change',
   ],
-  'Adventurous Scholar': [
-    'Chase thrills master skills',
-    'Learn fast live bold',
-  ],
-  'Dynamic Explorer': [
-    'Move fast explore more',
-    'Go further every day',
-  ],
-  'Creative Innovator': [
-    'Invent wonder inspire change',
-    'Make art meet impact',
-  ],
-  'Focused Scholar': [
-    'Quiet focus strong results',
-    'Deep work bright paths',
-  ],
-  'Balanced Adventurer': [
-    'Balance paths find power',
-    'Live steady dream big',
-  ],
-  'Nature-Loving Learner': [
-    'Grow with sky and soil',
-    'Learn outside breathe deeper',
-  ],
-  'Mindful Learner': [
-    'Calm steps clear horizons',
-    'Gentle focus great growth',
-  ],
+  'Adventurous Scholar': ['Chase thrills master skills', 'Learn fast live bold'],
+  'Dynamic Explorer': ['Move fast explore more', 'Go further every day'],
+  'Creative Innovator': ['Invent wonder inspire change', 'Make art meet impact'],
+  'Focused Scholar': ['Quiet focus strong results', 'Deep work bright paths'],
+  'Balanced Adventurer': ['Balance paths find power', 'Live steady dream big'],
+  'Nature-Loving Learner': ['Grow with sky and soil', 'Learn outside breathe deeper'],
+  'Mindful Learner': ['Calm steps clear horizons', 'Gentle focus great growth'],
   default: ['Explore learn and thrive'],
 };
 
@@ -89,14 +68,27 @@ export async function POST(req: Request) {
            FALLBACKS.default[0]);
 
     return NextResponse.json({ motto: toMaxEightWords(mottoRaw) });
-  } catch (err: any) {
-    const msg = String(err?.message || '');
-    const status = err?.status || err?.statusCode;
+  } catch (err) {
+    // ---- narrowed, no `any` ----
+    let status: number | undefined;
+    let msg = '';
+
+    if (err instanceof APIError) {
+      status = err.status;
+      msg = err.message ?? '';
+    } else if (err instanceof Error) {
+      msg = err.message;
+      // Some runtimes attach numeric fields like status/statusCode
+      const maybe = err as { status?: number; statusCode?: number };
+      status = maybe.status ?? maybe.statusCode;
+    }
+
     if (status === 429 || /quota|rate limit/i.test(msg)) {
       const pool = FALLBACKS.default;
       const motto = pool[Math.floor(Math.random() * pool.length)];
       return NextResponse.json({ motto: toMaxEightWords(motto), fallback: true });
     }
+
     console.error('[api/motto] error:', err);
     return NextResponse.json({ error: 'Failed to generate motto' }, { status: 500 });
   }

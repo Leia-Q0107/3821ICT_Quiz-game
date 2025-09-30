@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { saveAnswer, getAnswers } from '@/lib/answers';
+import Image from 'next/image';
 
 type ChoiceKey = 'creative' | 'fast' | 'relaxed' | 'mix';
 const QID = 'q4';
@@ -67,13 +68,17 @@ export default function Q4Page() {
         </span>
 
         {/* ===== 插画 ===== */}
-        <img
+        <Image
           src={selected ? `/quiz/q4/${selected}.png` : '/quiz/q4/base.png'}
           alt="Basecamp"
-          className="absolute select-none pointer-events-none"
-          style={{ top: 142, left: 59, width: 256, height: 256 }}
+          width={256}
+          height={256}
+          priority
+          className="absolute select-none pointer-events-none object-contain"
+          style={{ top: 142, left: 59 }}          // no need to set width/height in CSS
           draggable={false}
         />
+
 
         {/* ===== Big and Creative ===== */}
         <button

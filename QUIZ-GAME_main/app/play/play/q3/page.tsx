@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { saveAnswer } from '@/lib/answers';
+import Image from 'next/image';
 
 type ChoiceKey = 'work' | 'balanced' | 'relaxed' | 'party';
 
@@ -66,7 +67,13 @@ export default function Q3Page() {
           className={`bg-transparent ${selected === 'work' ? 'outline outline-[4px] outline-[#F3C468] rounded-[7px]' : ''}`}
           aria-label="All Work, No Play"
         >
-          <img src="/quiz/q3/icon-work.png" alt="work" className="w-full h-full object-contain" />
+          <Image 
+          src="/quiz/q3/icon-work.png" 
+          alt="work" 
+          width={138}  
+          height={210} 
+          className="w-full h-full object-contain" 
+          />
         </button>
         <span
           style={{
@@ -93,7 +100,13 @@ export default function Q3Page() {
           className={`bg-transparent ${selected === 'balanced' ? 'outline outline-[4px] outline-[#F3C468] rounded-[7px]' : ''}`}
           aria-label="Balanced Adventurer"
         >
-          <img src="/quiz/q3/icon-balanced.png" alt="balanced" className="w-full h-full object-contain" />
+          <Image 
+          src="/quiz/q3/icon-balanced.png" 
+          alt="balanced" 
+          width={138} 
+          height={210} 
+          className="w-full h-full object-contain" 
+          />
         </button>
         <span
           style={{
@@ -120,7 +133,13 @@ export default function Q3Page() {
           className={`bg-transparent ${selected === 'relaxed' ? 'outline outline-[4px] outline-[#F3C468] rounded-[7px]' : ''}`}
           aria-label="Relaxed Scholar"
         >
-          <img src="/quiz/q3/icon-relaxed.png" alt="relaxed" className="w-full h-full object-contain" />
+          <Image 
+          src="/quiz/q3/icon-relaxed.png" 
+          alt="relaxed" 
+          width={138}  
+          height={210} 
+          className="w-full h-full object-contain" 
+          />
         </button>
         <span
           style={{
@@ -147,7 +166,12 @@ export default function Q3Page() {
           className={`bg-transparent ${selected === 'party' ? 'outline outline-[4px] outline-[#F3C468] rounded-[7px]' : ''}`}
           aria-label="Party Expert"
         >
-          <img src="/quiz/q3/icon-party.png" alt="party" className="w-full h-full object-contain" />
+          <Image 
+          src="/quiz/q3/icon-party.png" 
+          alt="party" 
+          width={138}  
+          height={210} 
+          className="w-full h-full object-contain" />
         </button>
         <span
           style={{
