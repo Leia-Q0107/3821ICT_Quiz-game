@@ -46,6 +46,6 @@ npm run db:ensure
 http://localhost:3000/admin/login
 ```
 ```
-username: admin
-password: 123
+username: admin_VVI
+password: admin_VVI_123
 ```
